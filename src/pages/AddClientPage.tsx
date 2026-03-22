@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { ArrowLeft } from 'lucide-react';
-import { v4 as uuidv4 } from 'crypto';
 
 const AddClientPage = () => {
   const { gymId } = useAuth();
