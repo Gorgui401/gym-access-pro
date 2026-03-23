@@ -1,5 +1,5 @@
 import { useLocation, Link } from 'react-router-dom';
-import { LayoutDashboard, Users, QrCode, CreditCard, Bell, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, QrCode, CreditCard, Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -15,16 +15,19 @@ export const BottomNav = () => {
 
   return (
     <nav className="bottom-nav">
-      {navItems.map((item) => (
-        <Link
-          key={item.to}
-          to={item.to}
-          className={cn('bottom-nav-item', pathname.startsWith(item.to) && 'active')}
-        >
-          <item.icon className="h-5 w-5" />
-          <span>{item.label}</span>
-        </Link>
-      ))}
+      {navItems.map((item) => {
+        const active = pathname.startsWith(item.to);
+        return (
+          <Link
+            key={item.to}
+            to={item.to}
+            className={cn('bottom-nav-item', active && 'active')}
+          >
+            <item.icon className={cn('h-5 w-5', active && 'scale-110')} />
+            <span className="font-semibold">{item.label}</span>
+          </Link>
+        );
+      })}
     </nav>
   );
 };
