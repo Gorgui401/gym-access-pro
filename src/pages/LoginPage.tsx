@@ -38,64 +38,66 @@ const LoginPage = () => {
     <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-background">
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center space-y-2">
-          <div className="mx-auto h-14 w-14 rounded-2xl bg-primary flex items-center justify-center mb-4">
-            <Dumbbell className="h-7 w-7 text-primary-foreground" />
+          <div className="mx-auto h-16 w-16 rounded-2xl bg-primary flex items-center justify-center mb-4 shadow-lg shadow-primary/30">
+            <Dumbbell className="h-8 w-8 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold font-display">GymFlow</h1>
+          <h1 className="text-3xl font-extrabold font-display tracking-tight">GymFlow</h1>
           <p className="text-muted-foreground text-sm">Gérez votre salle de sport simplement</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {isSignUp && (
+        <div className="bg-card rounded-2xl p-6 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {isSignUp && (
+              <div className="space-y-2">
+                <Label htmlFor="name">Nom complet</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Votre nom"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className="h-12 rounded-xl border-0 bg-muted"
+                />
+              </div>
+            )}
             <div className="space-y-2">
-              <Label htmlFor="name">Nom complet</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="name"
-                type="text"
-                placeholder="Votre nom"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="votre@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-12"
+                className="h-12 rounded-xl border-0 bg-muted"
               />
             </div>
-          )}
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="votre@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="h-12"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Mot de passe</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              className="h-12"
-            />
-          </div>
-          <Button type="submit" variant="touch" className="w-full" size="lg" disabled={isLoading}>
-            {isLoading ? (isSignUp ? 'Création...' : 'Connexion...') : (isSignUp ? 'Créer un compte' : 'Se connecter')}
-          </Button>
-        </form>
+            <div className="space-y-2">
+              <Label htmlFor="password">Mot de passe</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                className="h-12 rounded-xl border-0 bg-muted"
+              />
+            </div>
+            <Button type="submit" variant="touch" className="w-full shadow-md shadow-primary/20" size="lg" disabled={isLoading}>
+              {isLoading ? (isSignUp ? 'Création...' : 'Connexion...') : (isSignUp ? 'Créer un compte' : 'Se connecter')}
+            </Button>
+          </form>
+        </div>
 
         <p className="text-center text-sm text-muted-foreground">
           {isSignUp ? 'Déjà un compte ?' : "Pas encore de compte ?"}{' '}
           <button
             type="button"
             onClick={() => setIsSignUp(!isSignUp)}
-            className="text-primary font-medium hover:underline"
+            className="text-accent font-semibold hover:underline"
           >
             {isSignUp ? 'Se connecter' : "S'inscrire"}
           </button>
