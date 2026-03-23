@@ -10,16 +10,23 @@ import { Dumbbell } from 'lucide-react';
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await signIn(email, password);
-      navigate('/dashboard');
+      if (isSignUp) {
+        await signUp(email, password, { name });
+        toast.success('Compte créé ! Vérifiez votre email pour confirmer.');
+      } else {
+        await signIn(email, password);
+        navigate('/dashboard');
+      }
     } catch (err: any) {
       toast.error(err.message || 'Erreur de connexion');
     } finally {
@@ -39,6 +46,20 @@ const LoginPage = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {isSignUp && (
+            <div className="space-y-2">
+              <Label htmlFor="name">Nom complet</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Votre nom"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="h-12"
+              />
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -60,13 +81,25 @@ const LoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
               className="h-12"
             />
           </div>
           <Button type="submit" variant="touch" className="w-full" size="lg" disabled={isLoading}>
-            {isLoading ? 'Connexion...' : 'Se connecter'}
+            {isLoading ? (isSignUp ? 'Création...' : 'Connexion...') : (isSignUp ? 'Créer un compte' : 'Se connecter')}
           </Button>
         </form>
+
+        <p className="text-center text-sm text-muted-foreground">
+          {isSignUp ? 'Déjà un compte ?' : "Pas encore de compte ?"}{' '}
+          <button
+            type="button"
+            onClick={() => setIsSignUp(!isSignUp)}
+            className="text-primary font-medium hover:underline"
+          >
+            {isSignUp ? 'Se connecter' : "S'inscrire"}
+          </button>
+        </p>
       </div>
     </div>
   );
