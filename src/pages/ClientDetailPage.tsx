@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Phone, MapPin, Calendar } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { clientService } from '@/services/clientService';
+import { subscriptionService } from '@/services/subscriptionService';
 
 const ClientDetailPage = () => {
   const { id } = useParams();
@@ -12,13 +13,16 @@ const ClientDetailPage = () => {
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
 
   useEffect(() => {
+    if (!id) return;
     const fetch = async () => {
-      const { data: c } = await supabase.from('clients').select('*').eq('id', id).single();
+      const [c, subs] = await Promise.all([
+        clientService.getById(id),
+        subscriptionService.getByClientId(id),
+      ]);
       setClient(c);
-      const { data: subs } = await supabase.from('subscriptions').select('*').eq('client_id', id).order('start_date', { ascending: false });
-      setSubscriptions(subs || []);
+      setSubscriptions(subs);
     };
-    if (id) fetch();
+    fetch();
   }, [id]);
 
   if (!client) return <p className="text-center py-8 text-muted-foreground">Chargement...</p>;
@@ -28,9 +32,7 @@ const ClientDetailPage = () => {
   return (
     <div className="space-y-6 animate-slide-up">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}><ArrowLeft className="h-5 w-5" /></Button>
         <h1 className="text-2xl font-bold font-display">Fiche client</h1>
       </div>
 
@@ -46,13 +48,11 @@ const ClientDetailPage = () => {
 
       <div className="space-y-3">
         <div className="flex items-center gap-3 p-3 rounded-xl border bg-card">
-          <Phone className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm">{client.phone}</span>
+          <Phone className="h-4 w-4 text-muted-foreground" /><span className="text-sm">{client.phone}</span>
         </div>
         {client.address && (
           <div className="flex items-center gap-3 p-3 rounded-xl border bg-card">
-            <MapPin className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">{client.address}</span>
+            <MapPin className="h-4 w-4 text-muted-foreground" /><span className="text-sm">{client.address}</span>
           </div>
         )}
       </div>
@@ -76,9 +76,7 @@ const ClientDetailPage = () => {
                 {new Date(sub.start_date).toLocaleDateString('fr-FR')} → {new Date(sub.end_date).toLocaleDateString('fr-FR')}
               </p>
             </div>
-            <span className={sub.status === 'actif' ? 'status-active' : 'status-expired'}>
-              {sub.status}
-            </span>
+            <span className={sub.status === 'actif' ? 'status-active' : 'status-expired'}>{sub.status}</span>
           </div>
         ))}
       </div>

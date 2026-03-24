@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Bell } from 'lucide-react';
+import { subscriptionService } from '@/services/subscriptionService';
 
 const AlertsPage = () => {
   const { gymId } = useAuth();
@@ -9,22 +9,12 @@ const AlertsPage = () => {
 
   useEffect(() => {
     if (!gymId) return;
-    const fetch = async () => {
-      const { data } = await supabase
-        .from('subscriptions')
-        .select('*, clients!inner(name, phone, gym_id)')
-        .eq('clients.gym_id', gymId)
-        .eq('status', 'expiré')
-        .order('end_date', { ascending: false });
-      setExpiredClients(data || []);
-    };
-    fetch();
+    subscriptionService.getExpired(gymId).then(setExpiredClients);
   }, [gymId]);
 
   return (
     <div className="space-y-6 animate-slide-up">
       <h1 className="text-2xl font-bold font-display">Alertes & Relances</h1>
-
       <div className="card-stat border-secondary/30 bg-secondary/5">
         <div className="flex items-center gap-3">
           <Bell className="h-5 w-5 text-secondary" />
@@ -34,11 +24,8 @@ const AlertsPage = () => {
           </div>
         </div>
       </div>
-
       <div className="space-y-2">
-        {expiredClients.length === 0 && (
-          <p className="text-center text-muted-foreground py-8">Aucune alerte 🎉</p>
-        )}
+        {expiredClients.length === 0 && <p className="text-center text-muted-foreground py-8">Aucune alerte 🎉</p>}
         {expiredClients.map((sub) => (
           <div key={sub.id} className="flex items-center justify-between p-3 rounded-xl border bg-card">
             <div>
@@ -47,9 +34,7 @@ const AlertsPage = () => {
             </div>
             <div className="text-right">
               <span className="status-expired">Expiré</span>
-              <p className="text-xs text-muted-foreground mt-1">
-                {new Date(sub.end_date).toLocaleDateString('fr-FR')}
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">{new Date(sub.end_date).toLocaleDateString('fr-FR')}</p>
             </div>
           </div>
         ))}

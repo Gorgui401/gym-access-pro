@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { authService } from '@/services/authService';
 
 type AppRole = 'admin' | 'manager' | 'user';
 
@@ -25,23 +25,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   const fetchUserRole = async (userId: string) => {
-    const { data } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-      .single();
-    if (data) setRole(data.role as AppRole);
-    
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('gym_id')
-      .eq('id', userId)
-      .single();
+    const userRole = await authService.getUserRole(userId);
+    if (userRole) setRole(userRole as AppRole);
+    const profile = await authService.getUserProfile(userId);
     if (profile) setGymId(profile.gym_id);
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = authService.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -53,12 +44,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    authService.getSession().then((session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserRole(session.user.id);
-      }
+      if (session?.user) fetchUserRole(session.user.id);
       setLoading(false);
     });
 
@@ -66,21 +55,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    await authService.signIn(email, password);
   };
 
   const signUp = async (email: string, password: string, metadata?: Record<string, unknown>) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: metadata, emailRedirectTo: window.location.origin },
-    });
-    if (error) throw error;
+    await authService.signUp(email, password, metadata);
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await authService.signOut();
   };
 
   return (
