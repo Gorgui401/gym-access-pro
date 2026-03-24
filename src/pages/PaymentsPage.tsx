@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { CreditCard } from 'lucide-react';
+import { paymentService } from '@/services/paymentService';
 
 const PaymentsPage = () => {
   const { gymId } = useAuth();
@@ -9,16 +9,7 @@ const PaymentsPage = () => {
 
   useEffect(() => {
     if (!gymId) return;
-    const fetch = async () => {
-      const { data } = await supabase
-        .from('payments')
-        .select('*, clients!inner(name, gym_id)')
-        .eq('clients.gym_id', gymId)
-        .order('date', { ascending: false })
-        .limit(50);
-      setPayments(data || []);
-    };
-    fetch();
+    paymentService.getByGym(gymId).then(setPayments);
   }, [gymId]);
 
   const total = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
@@ -26,19 +17,15 @@ const PaymentsPage = () => {
   return (
     <div className="space-y-6 animate-slide-up">
       <h1 className="text-2xl font-bold font-display">Paiements</h1>
-
       <div className="card-stat">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
-            <CreditCard className="h-5 w-5" />
-          </div>
+          <div className="h-10 w-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary"><CreditCard className="h-5 w-5" /></div>
           <div>
             <p className="text-sm text-muted-foreground">Total affiché</p>
             <p className="text-xl font-bold font-display">{total.toLocaleString()} F CFA</p>
           </div>
         </div>
       </div>
-
       <div className="space-y-2">
         {payments.length === 0 && <p className="text-center text-muted-foreground py-8">Aucun paiement</p>}
         {payments.map((p) => (

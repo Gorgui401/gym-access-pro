@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { StatCard } from '@/components/StatCard';
 import { Users, CreditCard, AlertTriangle, TrendingUp, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { clientService } from '@/services/clientService';
+import { subscriptionService } from '@/services/subscriptionService';
+import { paymentService } from '@/services/paymentService';
 
 const DashboardPage = () => {
   const { gymId } = useAuth();
@@ -14,47 +16,16 @@ const DashboardPage = () => {
     if (!gymId) return;
     
     const fetchStats = async () => {
-      const { count: clientCount } = await supabase
-        .from('clients')
-        .select('*', { count: 'exact', head: true })
-        .eq('gym_id', gymId);
+      const [clientCount, activeCount, expiredCount, revenue, recent] = await Promise.all([
+        clientService.count(gymId),
+        subscriptionService.countByStatus(gymId, 'actif'),
+        subscriptionService.countByStatus(gymId, 'expiré'),
+        paymentService.getMonthlyRevenue(gymId),
+        clientService.getRecent(gymId, 5),
+      ]);
 
-      const { count: activeCount } = await supabase
-        .from('subscriptions')
-        .select('*, clients!inner(gym_id)', { count: 'exact', head: true })
-        .eq('clients.gym_id', gymId)
-        .eq('status', 'actif');
-
-      const { count: expiredCount } = await supabase
-        .from('subscriptions')
-        .select('*, clients!inner(gym_id)', { count: 'exact', head: true })
-        .eq('clients.gym_id', gymId)
-        .eq('status', 'expiré');
-
-      const now = new Date();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-      const { data: payments } = await supabase
-        .from('payments')
-        .select('amount, clients!inner(gym_id)')
-        .eq('clients.gym_id', gymId)
-        .gte('date', startOfMonth);
-
-      const revenue = payments?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
-
-      setStats({
-        clients: clientCount || 0,
-        activeSubscriptions: activeCount || 0,
-        expiredSubscriptions: expiredCount || 0,
-        monthlyRevenue: revenue,
-      });
-
-      const { data: recent } = await supabase
-        .from('clients')
-        .select('*')
-        .eq('gym_id', gymId)
-        .order('created_at', { ascending: false })
-        .limit(5);
-      setRecentClients(recent || []);
+      setStats({ clients: clientCount, activeSubscriptions: activeCount, expiredSubscriptions: expiredCount, monthlyRevenue: revenue });
+      setRecentClients(recent);
     };
 
     fetchStats();
@@ -68,34 +39,10 @@ const DashboardPage = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatCard
-          title="Clients"
-          value={stats.clients}
-          icon={<Users className="h-5 w-5" />}
-          iconBg="bg-accent/10"
-          iconColor="text-accent"
-        />
-        <StatCard
-          title="Actifs"
-          value={stats.activeSubscriptions}
-          icon={<TrendingUp className="h-5 w-5" />}
-          iconBg="bg-[hsl(var(--success)/0.12)]"
-          iconColor="text-[hsl(var(--success))]"
-        />
-        <StatCard
-          title="Expirés"
-          value={stats.expiredSubscriptions}
-          icon={<AlertTriangle className="h-5 w-5" />}
-          iconBg="bg-[hsl(var(--warning)/0.12)]"
-          iconColor="text-[hsl(var(--warning))]"
-        />
-        <StatCard
-          title="Revenus"
-          value={`${stats.monthlyRevenue.toLocaleString()} F`}
-          icon={<CreditCard className="h-5 w-5" />}
-          iconBg="bg-primary/10"
-          iconColor="text-primary"
-        />
+        <StatCard title="Clients" value={stats.clients} icon={<Users className="h-5 w-5" />} iconBg="bg-accent/10" iconColor="text-accent" />
+        <StatCard title="Actifs" value={stats.activeSubscriptions} icon={<TrendingUp className="h-5 w-5" />} iconBg="bg-[hsl(var(--success)/0.12)]" iconColor="text-[hsl(var(--success))]" />
+        <StatCard title="Expirés" value={stats.expiredSubscriptions} icon={<AlertTriangle className="h-5 w-5" />} iconBg="bg-[hsl(var(--warning)/0.12)]" iconColor="text-[hsl(var(--warning))]" />
+        <StatCard title="Revenus" value={`${stats.monthlyRevenue.toLocaleString()} F`} icon={<CreditCard className="h-5 w-5" />} iconBg="bg-primary/10" iconColor="text-primary" />
       </div>
 
       <div className="bg-card rounded-2xl p-5 shadow-sm">
@@ -110,11 +57,7 @@ const DashboardPage = () => {
             <p className="text-muted-foreground text-sm py-8 text-center">Aucun client pour le moment</p>
           )}
           {recentClients.map((client) => (
-            <Link
-              key={client.id}
-              to={`/clients/${client.id}`}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors"
-            >
+            <Link key={client.id} to={`/clients/${client.id}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
               {client.photo_url ? (
                 <img src={client.photo_url} alt={client.name} className="h-10 w-10 rounded-full object-cover" />
               ) : (
