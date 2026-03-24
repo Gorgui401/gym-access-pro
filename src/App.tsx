@@ -47,23 +47,19 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppRoutes = () => (
   <Routes>
-            <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/clients" element={<ClientsPage />} />
-              <Route path="/clients/new" element={<AddClientPage />} />
-              <Route path="/clients/:id" element={<ClientDetailPage />} />
-              <Route path="/scan" element={<ScanPage />} />
-              <Route path="/payments" element={<PaymentsPage />} />
-              <Route path="/alerts" element={<AlertsPage />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+    <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+    <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/clients" element={<ClientsPage />} />
+      <Route path="/clients/new" element={<AddClientPage />} />
+      <Route path="/clients/:id" element={<ClientDetailPage />} />
+      <Route path="/scan" element={<ScanPage />} />
+      <Route path="/payments" element={<PaymentsPage />} />
+      <Route path="/alerts" element={<AlertsPage />} />
+    </Route>
+    <Route path="*" element={<NotFound />} />
+  </Routes>
 );
 
 export default App;
