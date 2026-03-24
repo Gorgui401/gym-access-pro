@@ -17,6 +17,20 @@ import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   if (loading) return <div className="flex items-center justify-center min-h-screen"><p className="text-muted-foreground">Chargement...</p></div>;
@@ -31,31 +45,21 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/clients" element={<ClientsPage />} />
-              <Route path="/clients/new" element={<AddClientPage />} />
-              <Route path="/clients/:id" element={<ClientDetailPage />} />
-              <Route path="/scan" element={<ScanPage />} />
-              <Route path="/payments" element={<PaymentsPage />} />
-              <Route path="/alerts" element={<AlertsPage />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+const AppRoutes = () => (
+  <Routes>
+    <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+    <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/clients" element={<ClientsPage />} />
+      <Route path="/clients/new" element={<AddClientPage />} />
+      <Route path="/clients/:id" element={<ClientDetailPage />} />
+      <Route path="/scan" element={<ScanPage />} />
+      <Route path="/payments" element={<PaymentsPage />} />
+      <Route path="/alerts" element={<AlertsPage />} />
+    </Route>
+    <Route path="*" element={<NotFound />} />
+  </Routes>
 );
 
 export default App;
