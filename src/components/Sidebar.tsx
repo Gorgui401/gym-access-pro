@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, QrCode, CreditCard, Bell,
@@ -8,6 +7,11 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+
+interface SidebarProps {
+  expanded: boolean;
+  onToggle: () => void;
+}
 
 const managerNav = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -28,16 +32,48 @@ const adminNav = [
   { to: '/admin/settings', icon: Shield, label: 'Configuration' },
 ];
 
-export const Sidebar = () => {
+export const Sidebar = ({ expanded, onToggle }: SidebarProps) => {
   const { pathname } = useLocation();
   const { role, signOut, user } = useAuth();
-  const [expanded, setExpanded] = useState(true);
 
   const primaryNav = role === 'admin' ? adminNav : managerNav;
   const secondaryNav = role === 'admin' ? [] : managerSecondary;
 
   const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
   const userInitial = userName[0]?.toUpperCase() || 'U';
+
+  const NavItem = ({ item }: { item: typeof managerNav[0] }) => {
+    const active = item.to === '/dashboard' || item.to === '/admin'
+      ? pathname === item.to
+      : pathname.startsWith(item.to);
+
+    const link = (
+      <Link
+        to={item.to}
+        className={cn(
+          'flex items-center gap-3 rounded-xl text-sm font-medium transition-all',
+          expanded ? 'px-4 py-3' : 'px-0 py-3 justify-center',
+          active
+            ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-sidebar-primary/25'
+            : 'text-sidebar-foreground/55 hover:text-sidebar-foreground hover:bg-sidebar-accent'
+        )}
+      >
+        <item.icon className={cn('shrink-0', expanded ? 'h-[18px] w-[18px]' : 'h-5 w-5')} />
+        {expanded && <span>{item.label}</span>}
+      </Link>
+    );
+
+    if (!expanded) {
+      return (
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>{link}</TooltipTrigger>
+          <TooltipContent side="right" className="font-medium">{item.label}</TooltipContent>
+        </Tooltip>
+      );
+    }
+
+    return link;
+  };
 
   return (
     <aside
@@ -60,121 +96,49 @@ export const Sidebar = () => {
           )}
         </Link>
         {expanded && (
-          <button
-            onClick={() => setExpanded(false)}
-            className="h-7 w-7 rounded-lg flex items-center justify-center text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
-          >
+          <button onClick={onToggle} className="h-7 w-7 rounded-lg flex items-center justify-center text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
             <ChevronLeft className="h-4 w-4" />
           </button>
         )}
       </div>
 
-      {/* Expand button when collapsed */}
       {!expanded && (
         <div className="flex justify-center py-3">
-          <button
-            onClick={() => setExpanded(true)}
-            className="h-8 w-8 rounded-lg flex items-center justify-center text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
-          >
+          <button onClick={onToggle} className="h-8 w-8 rounded-lg flex items-center justify-center text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
       )}
 
-      {/* Section label */}
       {expanded && (
         <div className="px-5 pt-5 pb-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-sidebar-foreground/30">Menu</p>
         </div>
       )}
 
-      {/* Primary Nav */}
       <nav className={cn('flex-1 space-y-0.5', expanded ? 'px-3' : 'px-2 pt-1')}>
-        {primaryNav.map((item) => {
-          const active = item.to === '/dashboard' || item.to === '/admin'
-            ? pathname === item.to
-            : pathname.startsWith(item.to);
+        {primaryNav.map((item) => (
+          <NavItem key={item.to} item={item} />
+        ))}
 
-          const linkContent = (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={cn(
-                'flex items-center gap-3 rounded-xl text-sm font-medium transition-all group',
-                expanded ? 'px-4 py-3' : 'px-0 py-3 justify-center',
-                active
-                  ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-sidebar-primary/25'
-                  : 'text-sidebar-foreground/55 hover:text-sidebar-foreground hover:bg-sidebar-accent'
-              )}
-            >
-              <item.icon className={cn('shrink-0', expanded ? 'h-[18px] w-[18px]' : 'h-5 w-5')} />
-              {expanded && <span>{item.label}</span>}
-            </Link>
-          );
-
-          if (!expanded) {
-            return (
-              <Tooltip key={item.to} delayDuration={0}>
-                <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
-                <TooltipContent side="right" className="font-medium">
-                  {item.label}
-                </TooltipContent>
-              </Tooltip>
-            );
-          }
-
-          return linkContent;
-        })}
-
-        {/* Separator */}
         {secondaryNav.length > 0 && (
           <>
-            {expanded && (
+            {expanded ? (
               <div className="pt-5 pb-2 px-1">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-sidebar-foreground/30">Autres</p>
               </div>
+            ) : (
+              <div className="h-px bg-sidebar-border my-3 mx-1" />
             )}
-            {!expanded && <div className="h-px bg-sidebar-border my-3 mx-1" />}
-            {secondaryNav.map((item) => {
-              const active = pathname.startsWith(item.to);
-
-              const linkContent = (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={cn(
-                    'flex items-center gap-3 rounded-xl text-sm font-medium transition-all',
-                    expanded ? 'px-4 py-3' : 'px-0 py-3 justify-center',
-                    active
-                      ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-sidebar-primary/25'
-                      : 'text-sidebar-foreground/55 hover:text-sidebar-foreground hover:bg-sidebar-accent'
-                  )}
-                >
-                  <item.icon className={cn('shrink-0', expanded ? 'h-[18px] w-[18px]' : 'h-5 w-5')} />
-                  {expanded && <span>{item.label}</span>}
-                </Link>
-              );
-
-              if (!expanded) {
-                return (
-                  <Tooltip key={item.to} delayDuration={0}>
-                    <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
-                    <TooltipContent side="right" className="font-medium">
-                      {item.label}
-                    </TooltipContent>
-                  </Tooltip>
-                );
-              }
-
-              return linkContent;
-            })}
+            {secondaryNav.map((item) => (
+              <NavItem key={item.to} item={item} />
+            ))}
           </>
         )}
       </nav>
 
       {/* Bottom: User + Logout */}
       <div className={cn('border-t border-sidebar-border', expanded ? 'p-4' : 'p-2')}>
-        {/* User avatar */}
         <div className={cn('flex items-center gap-3 mb-3', !expanded && 'justify-center mb-2')}>
           <div className="h-9 w-9 rounded-full bg-sidebar-primary/20 flex items-center justify-center text-sidebar-primary font-bold text-sm shrink-0">
             {userInitial}
@@ -187,22 +151,15 @@ export const Sidebar = () => {
           )}
         </div>
 
-        {/* Logout */}
         {expanded ? (
-          <button
-            onClick={signOut}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-sidebar-foreground/45 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
-          >
+          <button onClick={signOut} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-sidebar-foreground/45 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
             <LogOut className="h-[18px] w-[18px]" />
             Déconnexion
           </button>
         ) : (
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
-              <button
-                onClick={signOut}
-                className="w-full flex items-center justify-center py-2.5 rounded-xl text-sidebar-foreground/45 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
-              >
+              <button onClick={signOut} className="w-full flex items-center justify-center py-2.5 rounded-xl text-sidebar-foreground/45 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
                 <LogOut className="h-5 w-5" />
               </button>
             </TooltipTrigger>
