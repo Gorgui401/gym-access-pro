@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -15,7 +15,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 224 40% 22%;
 
-    --primary: 224 58% 31%;
+    --primary: 22 100% 58%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 224 14% 96%;
@@ -24,7 +24,7 @@
     --muted: 220 14% 93%;
     --muted-foreground: 220 10% 50%;
 
-    --accent: 217 91% 60%;
+    --accent: 22 100% 58%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
@@ -32,7 +32,12 @@
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 217 91% 60%;
+    --ring: 22 100% 58%;
+
+    --auth-bg: 340 6% 8%;
+    --auth-card: 340 6% 12%;
+    --auth-input: 340 6% 18%;
+    --auth-muted: 0 0% 73%;
 
     --radius: 0.875rem;
 
@@ -40,14 +45,14 @@
     --warning: 36 100% 57%;
     --info: 217 91% 60%;
 
-    --sidebar-background: 224 40% 16%;
-    --sidebar-foreground: 220 14% 90%;
-    --sidebar-primary: 217 91% 60%;
+    --sidebar-background: 18 28% 15%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 22 100% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 224 35% 22%;
-    --sidebar-accent-foreground: 220 14% 96%;
-    --sidebar-border: 224 30% 24%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-accent: 18 28% 22%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 18 20% 24%;
+    --sidebar-ring: 22 100% 58%;
 
     --font-display: 'Plus Jakarta Sans', sans-serif;
     --font-body: 'Inter', sans-serif;
