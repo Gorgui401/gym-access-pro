@@ -20,6 +20,7 @@ import ManagerClientDetails from "@/pages/manager/ClientDetails";
 import AddClientPage from "@/pages/AddClientPage";
 import ScanPage from "@/pages/ScanPage";
 import PaymentsPage from "@/pages/PaymentsPage";
+import SubscriptionsPage from "@/pages/SubscriptionsPage";
 import ManagerNotifications from "@/pages/manager/Notifications";
 
 // Admin pages
@@ -84,6 +85,7 @@ const AppRoutes = () => (
       <Route path="/clients/:id" element={<ManagerClientDetails />} />
       <Route path="/scan" element={<ScanPage />} />
       <Route path="/payments" element={<PaymentsPage />} />
+      <Route path="/subscriptions" element={<SubscriptionsPage />} />
       <Route path="/alerts" element={<ManagerNotifications />} />
     </Route>
 

@@ -43,6 +43,28 @@ export const subscriptionService = {
     return data || [];
   },
 
+  async getAllByGym(gymId: string, search?: string) {
+    let query = supabase
+      .from('subscriptions')
+      .select('*, clients!inner(name, phone, photo_url, gym_id)')
+      .eq('clients.gym_id', gymId)
+      .order('created_at', { ascending: false });
+    if (search) {
+      query = query.ilike('clients.name', `%${search}%`);
+    }
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  },
+
+  async renew(subscriptionId: string, newEnd: string) {
+    const { error } = await supabase
+      .from('subscriptions')
+      .update({ status: 'actif', end_date: newEnd })
+      .eq('id', subscriptionId);
+    if (error) throw error;
+  },
+
   async create(sub: {
     client_id: string;
     type: string;

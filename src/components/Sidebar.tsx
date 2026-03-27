@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Users, QrCode, CreditCard, Bell,
+  LayoutDashboard, Users, QrCode, CreditCard, Bell, CalendarCheck,
   Building2, Settings, LogOut, ChevronLeft, ChevronRight,
   Dumbbell, UserCog, Shield
 } from 'lucide-react';
@@ -16,6 +16,7 @@ interface SidebarProps {
 const managerNav = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/clients', icon: Users, label: 'Clients' },
+  { to: '/subscriptions', icon: CalendarCheck, label: 'Abonnements' },
   { to: '/scan', icon: QrCode, label: 'Scanner QR' },
   { to: '/payments', icon: CreditCard, label: 'Paiements' },
   { to: '/alerts', icon: Bell, label: 'Alertes' },
