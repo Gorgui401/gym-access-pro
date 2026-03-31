@@ -43,6 +43,24 @@ export const subscriptionService = {
     return data || [];
   },
 
+  async getExpiringSoon(gymId: string, days = 7) {
+    const today = new Date().toISOString().split('T')[0];
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + days);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+
+    const { data, error } = await supabase
+      .from('subscriptions')
+      .select('*, clients!inner(name, phone, gym_id)')
+      .eq('clients.gym_id', gymId)
+      .eq('status', 'actif')
+      .gte('end_date', today)
+      .lte('end_date', futureDateStr)
+      .order('end_date', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  },
+
   async getAllByGym(gymId: string, search?: string) {
     let query = supabase
       .from('subscriptions')

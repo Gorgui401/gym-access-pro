@@ -7,6 +7,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAlertCount } from '@/hooks/useAlertCount';
 
 interface SidebarProps {
   expanded: boolean;
@@ -36,6 +37,7 @@ const adminNav = [
 export const Sidebar = ({ expanded, onToggle }: SidebarProps) => {
   const { pathname } = useLocation();
   const { role, signOut, user } = useAuth();
+  const alertCount = useAlertCount();
 
   const primaryNav = role === 'admin' ? adminNav : managerNav;
   const secondaryNav = role === 'admin' ? [] : managerSecondary;
@@ -48,11 +50,13 @@ export const Sidebar = ({ expanded, onToggle }: SidebarProps) => {
       ? pathname === item.to
       : pathname.startsWith(item.to);
 
+    const showBadge = item.to === '/alerts' && alertCount > 0;
+
     const link = (
       <Link
         to={item.to}
         className={cn(
-          'flex items-center gap-3 rounded-xl text-sm font-medium transition-all',
+          'flex items-center gap-3 rounded-xl text-sm font-medium transition-all relative',
           expanded ? 'px-4 py-3' : 'px-0 py-3 justify-center',
           active
             ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-sidebar-primary/25'
@@ -61,6 +65,14 @@ export const Sidebar = ({ expanded, onToggle }: SidebarProps) => {
       >
         <item.icon className={cn('shrink-0', expanded ? 'h-[18px] w-[18px]' : 'h-5 w-5')} />
         {expanded && <span>{item.label}</span>}
+        {showBadge && (
+          <span className={cn(
+            'flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold min-w-[18px] h-[18px] px-1',
+            expanded ? 'ml-auto' : 'absolute -top-1 -right-1'
+          )}>
+            {alertCount > 99 ? '99+' : alertCount}
+          </span>
+        )}
       </Link>
     );
 
