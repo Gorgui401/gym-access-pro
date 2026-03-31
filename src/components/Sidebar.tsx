@@ -37,6 +37,7 @@ const adminNav = [
 export const Sidebar = ({ expanded, onToggle }: SidebarProps) => {
   const { pathname } = useLocation();
   const { role, signOut, user } = useAuth();
+  const alertCount = useAlertCount();
 
   const primaryNav = role === 'admin' ? adminNav : managerNav;
   const secondaryNav = role === 'admin' ? [] : managerSecondary;
