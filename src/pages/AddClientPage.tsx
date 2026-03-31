@@ -6,11 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from 'sonner';
-import { ArrowLeft, Camera, Check } from 'lucide-react';
+import { ArrowLeft, Camera, Check, AlertCircle } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { clientService } from '@/services/clientService';
 import { subscriptionService } from '@/services/subscriptionService';
 import { paymentService } from '@/services/paymentService';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const SUBSCRIPTION_TYPES = [
   { value: 'mensuel', label: 'Mensuel', days: 30 },
@@ -51,7 +52,10 @@ const AddClientPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!gymId) { toast.error('Salle non trouvée'); return; }
+    if (!gymId) { 
+      toast.error('Action impossible : aucune salle associée à votre compte.'); 
+      return; 
+    }
     if (!photoFile) { toast.error('La photo est obligatoire'); return; }
     if (!amount || Number(amount) <= 0) { toast.error('Montant invalide'); return; }
 
@@ -86,6 +90,26 @@ const AddClientPage = () => {
     }
   };
 
+  if (!gymId) {
+    return (
+      <div className="space-y-6 animate-slide-up">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}><ArrowLeft className="h-5 w-5" /></Button>
+          <h1 className="text-2xl font-bold font-display">Nouveau client</h1>
+        </div>
+        <Alert variant="destructive" className="bg-destructive/5 border-destructive/20">
+          <AlertCircle className="h-5 w-5" />
+          <AlertTitle>Salle non configurée</AlertTitle>
+          <AlertDescription>
+            Vous ne pouvez pas ajouter de client car votre compte n'est associé à aucune salle de sport. 
+            Veuillez configurer votre salle dans le Dashboard.
+          </AlertDescription>
+        </Alert>
+        <Button className="w-full" onClick={() => navigate('/dashboard')}>Retour au Dashboard</Button>
+      </div>
+    );
+  }
+
   if (createdQrCode) {
     return (
       <div className="flex flex-col items-center justify-center gap-6 animate-slide-up py-8">
@@ -95,8 +119,8 @@ const AddClientPage = () => {
         <div className="bg-white p-6 rounded-2xl shadow-lg"><QRCodeSVG value={createdQrCode} size={200} /></div>
         <p className="text-sm text-muted-foreground">QR Code d'accès à la salle</p>
         <div className="flex gap-3 w-full max-w-xs">
-          <Button variant="touch-outline" className="flex-1" onClick={() => { setCreatedQrCode(null); setCreatedClientName(''); setName(''); setPhone(''); setAddress(''); setPhotoFile(null); setPhotoPreview(null); setAmount(''); setSubType('mensuel'); setPaymentMethod('cash'); }}>Nouveau client</Button>
-          <Button variant="touch" className="flex-1" onClick={() => navigate('/clients')}>Liste clients</Button>
+          <Button variant="outline" className="flex-1" onClick={() => { setCreatedQrCode(null); setCreatedClientName(''); setName(''); setPhone(''); setAddress(''); setPhotoFile(null); setPhotoPreview(null); setAmount(''); setSubType('mensuel'); setPaymentMethod('cash'); }}>Nouveau client</Button>
+          <Button className="flex-1" onClick={() => navigate('/clients')}>Liste clients</Button>
         </div>
       </div>
     );
@@ -145,7 +169,7 @@ const AddClientPage = () => {
             ))}
           </RadioGroup>
         </div>
-        <Button type="submit" variant="touch" className="w-full" size="lg" disabled={loading}>{loading ? 'Ajout en cours...' : 'Ajouter le client'}</Button>
+        <Button type="submit" className="w-full" size="lg" disabled={loading}>{loading ? 'Ajout en cours...' : 'Ajouter le client'}</Button>
       </form>
     </div>
   );
