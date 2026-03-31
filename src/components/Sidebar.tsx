@@ -7,6 +7,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAlertCount } from '@/hooks/useAlertCount';
 
 interface SidebarProps {
   expanded: boolean;
