@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Users, CreditCard, AlertTriangle, TrendingUp, ArrowRight, ArrowUpRight, ArrowDownRight, Calendar as CalendarIcon, Activity, Clock, Search, Filter, MoreHorizontal, Dumbbell, Building2, Plus } from 'lucide-react';
+import { Users, CreditCard, AlertTriangle, TrendingUp, ArrowRight, ArrowUpRight, ArrowDownRight, Calendar as CalendarIcon, Activity, Clock, Search, Filter, MoreHorizontal, Dumbbell } from 'lucide-react';
+import GymSetup from '@/components/GymSetup';
 import { Link } from 'react-router-dom';
 import { clientService } from '@/services/clientService';
 import { subscriptionService } from '@/services/subscriptionService';
