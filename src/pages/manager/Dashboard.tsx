@@ -18,7 +18,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const DashboardPage = () => {
-  const { user, gymId, loading: authLoading } = useAuth();
+  const { user, gymId, loading: authLoading, refreshProfile } = useAuth();
   const [stats, setStats] = useState({ clients: 0, activeSubscriptions: 0, expiredSubscriptions: 0, monthlyRevenue: 0 });
   const [recentClients, setRecentClients] = useState<any[]>([]);
   const [recentPayments, setRecentPayments] = useState<any[]>([]);
