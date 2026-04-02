@@ -81,6 +81,10 @@ const DashboardPage = () => {
     !paymentSearch || p.clients?.name?.toLowerCase().includes(paymentSearch.toLowerCase())
   );
 
+  if (!gymId) {
+    return <GymSetup onComplete={() => refreshProfile()} />;
+  }
+
   return (
     <div className="space-y-6 animate-slide-up">
       {/* Header */}
