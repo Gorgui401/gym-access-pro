@@ -76,26 +76,7 @@ const DashboardPage = () => {
   }
 
   if (!gymId) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4 animate-slide-up">
-        <div className="h-20 w-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6">
-          <Building2 className="h-10 w-10" />
-        </div>
-        <h1 className="text-2xl font-bold font-display mb-2">Bienvenue sur GymFlow !</h1>
-        <p className="text-muted-foreground max-w-md mb-8">
-          Votre compte n'est pas encore associé à une salle de sport. 
-          Veuillez contacter un administrateur ou configurer votre salle pour commencer.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
-          <Button variant="touch" className="w-full">
-            <Plus className="h-4 w-4 mr-2" /> Créer une salle
-          </Button>
-          <Button variant="touch-outline" className="w-full">
-            Rejoindre une salle
-          </Button>
-        </div>
-      </div>
-    );
+    return <GymSetup onComplete={() => refreshProfile()} />;
   }
 
   // Mock monthly chart data
