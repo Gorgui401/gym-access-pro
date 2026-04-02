@@ -13,6 +13,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, metadata?: Record<string, unknown>) => Promise<void>;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -66,8 +67,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await authService.signOut();
   };
 
+  const refreshProfile = async () => {
+    if (user) {
+      await fetchUserRole(user.id);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ session, user, role, gymId, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ session, user, role, gymId, loading, signIn, signUp, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

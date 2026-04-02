@@ -101,11 +101,12 @@ const AddClientPage = () => {
           <AlertCircle className="h-5 w-5" />
           <AlertTitle>Salle non configurée</AlertTitle>
           <AlertDescription>
-            Vous ne pouvez pas ajouter de client car votre compte n'est associé à aucune salle de sport. 
-            Veuillez configurer votre salle dans le Dashboard.
+            Votre compte n'est associé à aucune salle de sport. Rendez-vous sur le Dashboard pour créer ou rejoindre une salle avant d'ajouter des clients.
           </AlertDescription>
         </Alert>
-        <Button className="w-full" onClick={() => navigate('/dashboard')}>Retour au Dashboard</Button>
+        <Button className="w-full" onClick={() => navigate('/dashboard')}>
+          Configurer ma salle
+        </Button>
       </div>
     );
   }

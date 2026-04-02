@@ -15,9 +15,10 @@ import { Progress } from '@/components/ui/progress';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import GymSetup from '@/components/GymSetup';
 
 const DashboardPage = () => {
-  const { user, gymId } = useAuth();
+  const { user, gymId, refreshProfile } = useAuth();
   const [stats, setStats] = useState({ clients: 0, activeSubscriptions: 0, expiredSubscriptions: 0, monthlyRevenue: 0 });
   const [recentClients, setRecentClients] = useState<any[]>([]);
   const [recentPayments, setRecentPayments] = useState<any[]>([]);
@@ -79,6 +80,10 @@ const DashboardPage = () => {
   const filteredPayments = recentPayments.filter((p) =>
     !paymentSearch || p.clients?.name?.toLowerCase().includes(paymentSearch.toLowerCase())
   );
+
+  if (!gymId) {
+    return <GymSetup onComplete={() => refreshProfile()} />;
+  }
 
   return (
     <div className="space-y-6 animate-slide-up">
